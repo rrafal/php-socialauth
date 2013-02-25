@@ -4,27 +4,24 @@ include_once __DIR__ . '/util.php';
 
 try{
 
-	if( empty($_GET['login']) ){
-		SocialAuth_Util::redirect('index.php');
-	} 
-	
-	$provider = @$_GET['provider'];
+
+	$provider_name = @$_GET['provider'];
 	$identifier = @$_GET['identifier'];
 	
 	if($_GET['login'] == 'google'){
-		$provider = 'openid';
+		$provider_name = 'openid';
 		$identifier = 'https://www.google.com/accounts/o8/id';
 	} elseif($_GET['login'] == 'yahoo'){
-		$provider = 'openid';
+		$provider_name = 'openid';
 		$identifier = 'https://me.yahoo.com/';
-	} else {
-		SocialAuth_Util::redirect('index.php');
+	} elseif($_GET['login'] == 'facebook'){
+		$provider_name = 'facebook';
 	}
 	
 	
-	$provider = SocialAuth_Util::getProvider($provider);
+	$provider = SocialAuth_Util::getProvider($provider_name);
 	$provider->setIdentifier($identifier);
-	$provider->setReturnUrl( SocialAuth_Util::getRootUrl() . 'complete_login.php');
+	$provider->setReturnUrl( SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.$provider_name);
 
 	$info = $provider->beginLogin(array('nickname', 'email'));
 	

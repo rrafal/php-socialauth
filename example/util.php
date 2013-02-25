@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/../src/Radulski/SocialAuth/Manager.php';
 
 class SocialAuth_Util {
@@ -14,6 +15,7 @@ class SocialAuth_Util {
 	}
 	static function getProvider($name){
 		$config = array(
+			'facebook' => array('app_id' => FACEBOOK_APP_ID, 'secret' => FACEBOOK_SECRET),
 			'openid' => array('storage_type' => 'file', 'storage_path' => '/tmp/social_auth/'),
 		);
 		$manager = new Radulski\SocialAuth\Manager();

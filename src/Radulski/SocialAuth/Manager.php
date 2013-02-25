@@ -3,6 +3,7 @@
 namespace Radulski\SocialAuth;
 
 require_once __DIR__ . '/Provider.php';
+require_once __DIR__ . '/Provider/Facebook.php';
 require_once __DIR__ . '/Provider/OpenID.php';
 
 
@@ -42,6 +43,7 @@ class Manager {
 	}
 	public function configProviders($config){
 		$classes = array(
+			'facebook' => 'Radulski\SocialAuth\Provider\Facebook',
 			'openid' => 'Radulski\SocialAuth\Provider\OpenID',
 		);
 		
