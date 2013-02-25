@@ -1,11 +1,10 @@
-<?php
-include_once __DIR__ . '/../src/Radulski/SocialAuth/Manager.php';
-
-?>
 <html>
 <head>
 </head>
 <body>
 <h1>Login</h1>
+
+<a href="begin_login.php?login=google">with Google</a>
+<a href="begin_login.php?login=yahoo">with Yahoo</a>
 </body>
 </html>

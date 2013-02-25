@@ -1,25 +1,61 @@
 <?php
 
-namespace RadulskiLib\SocialAuth;
+namespace Radulski\SocialAuth;
+
+require_once __DIR__ . '/Provider.php';
+require_once __DIR__ . '/Provider/OpenID.php';
+
 
 class Manager {
+	private $base_url;
+	private $provider_map;
+	
+	public function __construct(){
+		$this->provider_map = array();
+	}
+	
+	public function setBaseUrl($base_url){
+		$this->base_url = $base_url;
+	}
+
 	/**
 	 * @return Base
 	 */
-	public static function getDriver($identifier){
-		switch($identifier){
-			case 'facebook':
-				throw new \Exception("Not implemented");
-			case 'twitter':
-				throw new \Exception("Not implemented");
-			case 'google':
-				return new OpenID('https://www.google.com/accounts/o8/id');
-			case 'yahoo':
-				return new OpenID('https://www.google.com/accounts/o8/id');
-			default:
-				return new OpenID($identifier);
-				
+	public function getProvider($name){
+		if( empty( $this->provider_map[$name] ) ){
+			throw new \Exception("Provider not registered: $name");
 		}
-	}
-}
+		
+		$info = $this->provider_map[$name];
+		$ref = new \ReflectionClass($info['class']);
+		
+		$provider = $ref->newInstanceArgs();
+		$provider->setBaseUrl($this->base_url);
+		$provider->config($info['config']);
 	
+		return $provider;
+	}
+	
+	public function registerProvider($name, $class, $config){
+
+		$this->provider_map[$name] = array('class'=>$class, 'config'=>$config);
+	}
+	public function configProviders($config){
+		$classes = array(
+			'openid' => 'Radulski\SocialAuth\Provider\OpenID',
+		);
+		
+		foreach($config as $name => $provider_config){
+			if( isset($provider_config['class']) ){
+				$class = $provider_config['class'];
+			} elseif( isset($classes[ $name ]) ){
+				$class = $classes[$name];
+			} else {
+				throw new \Exception("Provider not known: $name");
+			}
+			
+			$this->registerProvider($name, $class, $provider_config);
+		}
+	}	
+}
+

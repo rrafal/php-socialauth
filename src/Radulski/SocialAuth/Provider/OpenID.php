@@ -1,7 +1,8 @@
 <?php
 
-namespace RadulskiLib\SocialAuth;
+namespace Radulski\SocialAuth\Provider;
 
+require_once __DIR__.'/Base.php';
 require_once 'Auth/OpenID.php';
 require_once 'Auth/OpenID/AX.php';
 require_once 'Auth/OpenID/Consumer.php';
@@ -12,26 +13,47 @@ require_once 'Auth/OpenID/SReg.php';
  * Install: php-openid
  */
 class OpenID extends Base {
+
+	protected $storage_type;
+	protected $storage_config;
 	
-	function beginLogin(){
+	function config($config){
+		if( isset($config['storage_type']) ){
+			if( $config['storage_type'] == 'file' ){
+				$this->setFileStorage($config['storage_path']);
+			}
+		}
+	}
+	
+	public function setDatabaseStorage($type, $config){
+		$this->storage_type = 'database';
+		$this->storage_config = $config;
+	}
+	public function setFileStorage($path){
+		$this->storage_type = 'file';
+		$this->storage_config = array('path' => $path);	
+	}
+	
+	
+	function beginLogin(array $attributes = array()){
 		$consumer = $this->getOpenidConsumer();
 		$auth_request = $consumer->begin($this->identifier);
 		
 		// add
 		$ax_request = new \Auth_OpenID_AX_FetchRequest();  
-		if( in_array('email', $this->request_attributes) ){
+		if( in_array('email', $attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/contact/email', 1, true, 'email') );
 		}
-		if( in_array('fullname', $this->request_attributes) ){
+		if( in_array('fullname', $attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson', 1, true, 'fullname') );
 		}
-		if( in_array('nickname', $this->request_attributes) ){
+		if( in_array('nickname', $attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/friendly', 1, true, 'nickname') );
 		}
-		if( in_array('firstname', $this->request_attributes) ){
+		if( in_array('firstname', $attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/first', 1, true, 'firstname') );
 		}
-		if( in_array('lastname', $this->request_attributes) ){
+		if( in_array('lastname', $attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/last', 1, true, 'lastname') );   
 		}
 		
