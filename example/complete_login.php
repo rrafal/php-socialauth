@@ -1,11 +1,15 @@
 <?php
 include_once __DIR__ . '/util.php';
 $provider_name = $_GET['provider'];
+$identifier = $_GET['identifier'];
+
+$return_url =  SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.urlencode($provider_name);
+
 $provider = SocialAuth_Util::getProvider($provider_name);
 $provider->setIdentifier($identifier);
-$provider->setReturnUrl( SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.$provider_name);
+$provider->setReturnUrl( $return_url );
 
-$info = $provider->completeLogin($SERVER['QUERY_STRING']);
+$info = $provider->completeLogin($_SERVER['QUERY_STRING']);
 
 
 ?>
@@ -22,3 +26,4 @@ $info = $provider->completeLogin($SERVER['QUERY_STRING']);
 </dl> 
 </body>
 </html>
+

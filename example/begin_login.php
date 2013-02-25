@@ -18,12 +18,13 @@ try{
 		$provider_name = 'facebook';
 	}
 	
+	$return_url =  SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.urlencode($provider_name);
 	
 	$provider = SocialAuth_Util::getProvider($provider_name);
 	$provider->setIdentifier($identifier);
-	$provider->setReturnUrl( SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.$provider_name);
+	$provider->setReturnUrl( $return_url);
 
-	$info = $provider->beginLogin(array('nickname', 'email'));
+	$info = $provider->beginLogin(array('nickname', 'fullname', 'firstname', 'lastname', 'email'));
 	
 	if($info['type'] == 'redirect'){
 		SocialAuth_Util::redirect($info['url']);
