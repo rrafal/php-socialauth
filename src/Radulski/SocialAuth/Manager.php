@@ -5,6 +5,7 @@ namespace Radulski\SocialAuth;
 require_once __DIR__ . '/Provider.php';
 require_once __DIR__ . '/Provider/Facebook.php';
 require_once __DIR__ . '/Provider/OpenID.php';
+require_once __DIR__ . '/Provider/Twitter.php';
 
 
 class Manager {
@@ -45,6 +46,7 @@ class Manager {
 		$classes = array(
 			'facebook' => 'Radulski\SocialAuth\Provider\Facebook',
 			'openid' => 'Radulski\SocialAuth\Provider\OpenID',
+			'twitter' => 'Radulski\SocialAuth\Provider\Twitter',
 		);
 		
 		foreach($config as $name => $provider_config){

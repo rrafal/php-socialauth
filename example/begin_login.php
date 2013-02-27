@@ -16,6 +16,8 @@ try{
 		$identifier = 'https://me.yahoo.com/';
 	} elseif($_GET['login'] == 'facebook'){
 		$provider_name = 'facebook';
+	} elseif($_GET['login'] == 'twitter'){
+		$provider_name = 'twitter';
 	}
 	
 	$return_url =  SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.urlencode($provider_name);

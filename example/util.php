@@ -17,6 +17,7 @@ class SocialAuth_Util {
 		$config = array(
 			'facebook' => array('app_id' => FACEBOOK_APP_ID, 'secret' => FACEBOOK_SECRET),
 			'openid' => array('storage_type' => 'file', 'storage_path' => '/tmp/social_auth/'),
+			'twitter' => array('consumer_key' => TWITTER_CONSUMER_KEY, 'consumer_secret' => TWITTER_CONSUMER_SECRET),
 		);
 		$manager = new Radulski\SocialAuth\Manager();
 		$manager->setBaseUrl( self::getRootUrl() );
