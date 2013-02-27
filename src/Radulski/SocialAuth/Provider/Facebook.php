@@ -44,11 +44,15 @@ class Facebook extends Base {
 	}
 	function completeLogin($query){
 		$facebook = $this->getApi();
-		$user_id = $facebook->getUser();
-		if($user_id){
+		$this->user_id = $facebook->getUser();
+		$this->display_identifier = null;
+		
+		if($this->user_id){
 			$info = $facebook->api('/me');
 			$info['status'] = 'success';
-			$info['id'] = $user_id;
+			$info['id'] = $this->user_id;
+			
+			$this->display_identifier = $info['link'];
 		} else {
 			$info = array();
 			$info['status'] = 'cancel';

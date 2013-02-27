@@ -17,12 +17,22 @@ class OpenID extends Base {
 	protected $storage_type;
 	protected $storage_config;
 	
+	protected $user_url;
+	
+	
 	function config($config){
+		if( isset($config['user_url']) ){
+			$this->user_url = $config['user_url'];
+		}
 		if( isset($config['storage_type']) ){
 			if( $config['storage_type'] == 'file' ){
 				$this->setFileStorage($config['storage_path']);
 			}
 		}
+	}
+	
+	public function setUserUrl($url){
+		$this->user_url = $url;
 	}
 	
 	public function setDatabaseStorage($type, $config){
@@ -37,7 +47,7 @@ class OpenID extends Base {
 	
 	function beginLogin(array $attributes = array()){
 		$consumer = $this->getOpenidConsumer();
-		$auth_request = $consumer->begin($this->identifier);
+		$auth_request = $consumer->begin($this->user_url);
 		
 		// add
 		$ax_request = new \Auth_OpenID_AX_FetchRequest();  
@@ -117,10 +127,12 @@ class OpenID extends Base {
         	$sreg = $sreg_resp->contents();
 			
 			$ax_resp = \Auth_OpenID_AX_FetchResponse::fromSuccessResponse($response, false);
-
+			$this->user_id = $response->getDisplayIdentifier();
+			$this->display_identifier = $response->getDisplayIdentifier();
+			
 			$info = array(
 				'status' => 'success',
-				'identifier' => $response->getDisplayIdentifier(),
+				'id' => $this->user_id,
 			);
 			
 			// get info about the user

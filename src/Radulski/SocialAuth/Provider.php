@@ -7,7 +7,7 @@ interface Provider {
 	function config($config);
 
 	/**
-	 * Server's URL
+	 * Sets our server's URL
 	 */
 	function setBaseUrl($url);
 	
@@ -17,9 +17,22 @@ interface Provider {
 	function setReturnUrl($url);
 	
 	/**
-	 * Identifier used during login.
+	 * Sets what user we should connect to.
 	 */
-	function setIdentifier($id);
+	function loadUser($user_id);
+	
+	/**
+	 * Returns ID for current user.
+	 * Call this after login to save user's ID.
+	 * It must be unique within provider.
+	 */
+	function getUserId();
+	
+	/**
+	 * This is human-friendly identfier for the user.
+	 * It should be globally unique.
+	 */
+	function getDisplayIdentifier();
 
 	
 	/**

@@ -5,15 +5,15 @@ include_once __DIR__ . '/util.php';
 try{
 
 
-	$provider_name = @$_GET['provider'];
-	$identifier = @$_GET['identifier'];
+	$provider_name = null;
+	$user_url = null;
 	
 	if($_GET['login'] == 'google'){
 		$provider_name = 'openid';
-		$identifier = 'https://www.google.com/accounts/o8/id';
+		$user_url = 'https://www.google.com/accounts/o8/id';
 	} elseif($_GET['login'] == 'yahoo'){
 		$provider_name = 'openid';
-		$identifier = 'https://me.yahoo.com/';
+		$user_url = 'https://me.yahoo.com/';
 	} elseif($_GET['login'] == 'facebook'){
 		$provider_name = 'facebook';
 	} elseif($_GET['login'] == 'twitter'){
@@ -23,7 +23,9 @@ try{
 	$return_url =  SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.urlencode($provider_name);
 	
 	$provider = SocialAuth_Util::getProvider($provider_name);
-	$provider->setIdentifier($identifier);
+	if($provider_name == 'openid'){
+		$provider->setUserUrl($user_url);
+	}
 	$provider->setReturnUrl( $return_url);
 
 	$info = $provider->beginLogin(array('nickname', 'fullname', 'firstname', 'lastname', 'email'));

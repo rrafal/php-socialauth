@@ -5,12 +5,15 @@ namespace Radulski\SocialAuth\Provider;
 require_once __DIR__ . '/../Provider.php';
 
 abstract class Base implements \Radulski\SocialAuth\Provider {
-	protected $identifier;
+	protected $user_id;
+	protected $display_identifier;
+	
 	protected $base_url;
 	protected $return_url;
 	
+	
 	public function __construct(){
-
+		
 	}
 	
 	public abstract function config($config);
@@ -22,9 +25,16 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 		$this->return_url = $url;
 	}
 	
+	public function loadUser($user_id){
+		$this->user_id = $user_id;
+	}
 	
-	public function setIdentifier($id){
-		$this->identifier = $id;
+	public function getUserId(){
+		return $this->user_id;
+	}
+	
+	public function getDisplayIdentifier(){
+		return $this->display_identifier;
 	}
 	
 	/**

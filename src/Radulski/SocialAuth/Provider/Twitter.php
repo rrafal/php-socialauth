@@ -21,10 +21,11 @@ class Twitter extends Base {
 	private $access_token_url = 'https://api.twitter.com/oauth/access_token';
 	private $authenticate_url = 'https://api.twitter.com/oauth/authenticate';
 	private $request_token_url = 'https://api.twitter.com/oauth/request_token';
-	private $users_show_url = 'http://api.twitter.com/1.1/users/show.json';
+	private $request_base_url = 'https://api.twitter.com/1.1/';
 	private $store_name = 'Session';
 	private $consumer_key;
 	private $consumer_secret;
+
 	
 	function config($config){
 		if( isset($config['store']) ){
@@ -88,18 +89,28 @@ class Twitter extends Base {
 		$store = \OAuthStore::instance();
 		$store->addServerToken($this->consumer_key, 'access', $access_token['oauth_token'], $access_token['oauth_token_secret'], null);
 		
+		$this->user_id = $access_token['user_id'];
+		$this->display_identifier = 'http://twitter.com/'.$access_token['screen_name'];
+		
 		
 		// get account info
 		$params = array(
 			'user_id' => $access_token['user_id'], 
 			'screen_name' => $access_token['screen_name'],
 			);
-		$request = new \OAuthRequester($this->users_show_url, 'GET', $params);
+		$url = $this->getRequestUrl('account/verify_credentials');
+		$request = new \OAuthRequester($url, 'GET', $params);
 		$result = $request->doRequest();
 
 
 		$info = json_decode($result['body']);
+		
 		return $info;
 	}
+	
+	function getRequestUrl($name){
+		return $this->request_base_url . '/' . $name . '.json';
+	}
 }
+
 
