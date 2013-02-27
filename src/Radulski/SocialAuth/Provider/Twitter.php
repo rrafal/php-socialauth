@@ -21,6 +21,7 @@ class Twitter extends Base {
 	private $access_token_url = 'https://api.twitter.com/oauth/access_token';
 	private $authenticate_url = 'https://api.twitter.com/oauth/authenticate';
 	private $request_token_url = 'https://api.twitter.com/oauth/request_token';
+	private $users_show_url = 'http://api.twitter.com/1.1/users/show.json';
 	private $store_name = 'Session';
 	private $consumer_key;
 	private $consumer_secret;
@@ -62,27 +63,12 @@ class Twitter extends Base {
 		$params = array('oauth_callback' => $this->return_url);
 		$info = \OAuthRequester::requestRequestToken ( $this->consumer_key, 0, $params );
 
-		$url = $info['authorize_uri'] . '?oauth_token='.urlencode($info['token']);
+		$url = $this->authenticate_url . '?oauth_token='.urlencode($info['token']);
 		
 		return array(
     		'type' => 'redirect',
     		'url' => $url,
 		);
-		
-		/*$params = array('oauth_callback' => $this->return_url);
-		$request = new TwitterRequester($this->request_token_url, 'POST', $params);
-		$result = $request->doRequest();
-		
-		$info = array();
-		parse_str($result['body'], $info);
-		
-		$url = $this->authenticate_url . '?oauth_token='.urlencode($info['oauth_token']);
-
-		
-		return array(hicago,
-    		'type' => 'redirect',
-    		'url' => $url,
-		);*/
 	}
 	function completeLogin($query){
 		// get access token
@@ -93,7 +79,7 @@ class Twitter extends Base {
 			'oauth_verifier' => $query_options['oauth_verifier'], 
 			'oauth_token' => $query_options['oauth_token'],
 			);
-		$request = new TwitterRequester($this->access_token_url, 'POST', $params);
+		$request = new \OAuthRequester($this->access_token_url, 'POST', $params);
 		$result = $request->doRequest();
 		$access_token = array();
 		parse_str($result['body'], $access_token);
@@ -104,43 +90,16 @@ class Twitter extends Base {
 		
 		
 		// get account info
-		$params = array('user_id' => $access_token['user_id'], 'screen_name' => $access_token['screen_name']);
-		$request = new TwitterRequester('http://api.twitter.com/1.1/users/show.json', 'GET', $params);
+		$params = array(
+			'user_id' => $access_token['user_id'], 
+			'screen_name' => $access_token['screen_name'],
+			);
+		$request = new \OAuthRequester($this->users_show_url, 'GET', $params);
 		$result = $request->doRequest();
 
 
 		$info = json_decode($result['body']);
 		return $info;
-	}
-}
-
-class TwitterRequester extends \OAuthRequester {
-	/** oAuth authorization params must be ordered alphabetically **/
-	function getAuthorizationHeader ()
-	{
-		if (!$this->signed)
-		{
-			$this->sign($this->usr_id);
-		}
-		
-		$oauth_params = array();
-		foreach($this->param as $name => $value){
-			if (strncmp($name, 'oauth_', 6) == 0 || strncmp($name, 'xoauth_', 7) == 0)
-          	{
-				$oauth_params[ $name ] = $value;
-			}
-		}
-		ksort($oauth_params);
-		
-		$h   = array();
-		//$h[] = 'realm=""';
-		foreach ($oauth_params as $name => $value)
-		{
-			$h[] = $name.'="'.$value.'"';
-		}
-		$hs = 'Authorization: OAuth '.implode(', ', $h);
-
-		return $hs;
 	}
 }
 
