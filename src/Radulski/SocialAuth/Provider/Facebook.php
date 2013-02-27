@@ -27,7 +27,7 @@ class Facebook extends Base {
 	
 	
 	
-	function beginLogin(array $attributes = array()){
+	function beginLogin(){
 		$facebook = $this->getApi();
 		
 		$scope = array();

@@ -60,7 +60,7 @@ class Twitter extends Base {
 	
 	
 	
-	function beginLogin(array $attributes = array()){
+	function beginLogin(){
 		$params = array('oauth_callback' => $this->return_url);
 		$info = \OAuthRequester::requestRequestToken ( $this->consumer_key, 0, $params );
 

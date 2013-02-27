@@ -28,7 +28,7 @@ try{
 	}
 	$provider->setReturnUrl( $return_url);
 
-	$info = $provider->beginLogin(array('nickname', 'fullname', 'firstname', 'lastname', 'email'));
+	$info = $provider->beginLogin();
 	
 	if($info['type'] == 'redirect'){
 		SocialAuth_Util::redirect($info['url']);

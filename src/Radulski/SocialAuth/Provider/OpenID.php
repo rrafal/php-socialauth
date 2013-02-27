@@ -17,10 +17,20 @@ class OpenID extends Base {
 	protected $storage_type;
 	protected $storage_config;
 	
+	protected $login_attributes;
 	protected $user_url;
 	
 	
 	function config($config){
+		if( $this->login_attributes === null ){
+			$this->login_attributes = array();
+			$this->login_attributes[] = 'email';
+			$this->login_attributes[] = 'fullname';
+			$this->login_attributes[] = 'nickname';
+			$this->login_attributes[] = 'firstname';
+			$this->login_attributes[] = 'lastname';
+		}
+		
 		if( isset($config['user_url']) ){
 			$this->user_url = $config['user_url'];
 		}
@@ -29,6 +39,7 @@ class OpenID extends Base {
 				$this->setFileStorage($config['storage_path']);
 			}
 		}
+		
 	}
 	
 	public function setUserUrl($url){
@@ -45,25 +56,25 @@ class OpenID extends Base {
 	}
 	
 	
-	function beginLogin(array $attributes = array()){
+	function beginLogin(){
 		$consumer = $this->getOpenidConsumer();
 		$auth_request = $consumer->begin($this->user_url);
 		
 		// add
 		$ax_request = new \Auth_OpenID_AX_FetchRequest();  
-		if( in_array('email', $attributes) ){
+		if( in_array('email', $this->login_attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/contact/email', 1, true, 'email') );
 		}
-		if( in_array('fullname', $attributes) ){
+		if( in_array('fullname', $this->login_attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson', 1, true, 'fullname') );
 		}
-		if( in_array('nickname', $attributes) ){
+		if( in_array('nickname', $this->login_attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/friendly', 1, true, 'nickname') );
 		}
-		if( in_array('firstname', $attributes) ){
+		if( in_array('firstname', $this->login_attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/first', 1, true, 'firstname') );
 		}
-		if( in_array('lastname', $attributes) ){
+		if( in_array('lastname', $this->login_attributes) ){
 			$ax_request->add( \Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/last', 1, true, 'lastname') );   
 		}
 		

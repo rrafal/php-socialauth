@@ -43,10 +43,9 @@ interface Provider {
 	 * - array('type' => 'redirect', 'url' => '...')
 	 * - array('type' => 'html', 'html' => '...')
 	 *
-	 * @param $attributes Attributes to request during login.
 	 * 
 	 */
-	function beginLogin(array $attributes);
+	function beginLogin();
 	
 	/**
 	 * Completes login process
