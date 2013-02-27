@@ -8,7 +8,10 @@ $return_url =  SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.ur
 $provider = SocialAuth_Util::getProvider($provider_name);
 $provider->setReturnUrl( $return_url );
 
-$info = $provider->completeLogin($_SERVER['QUERY_STRING']);
+$ok = $provider->completeLogin($_SERVER['QUERY_STRING']);
+if( ! $ok){
+	die("Login Failed");
+}
 
 ?>
 <html>
@@ -22,7 +25,7 @@ $info = $provider->completeLogin($_SERVER['QUERY_STRING']);
 	<dt>Display Name</dt>
 	<dd><?php echo htmlentities($provider->getDisplayIdentifier()); ?></dd>
 
-<?php foreach($info as $k => $v): ?>
+<?php foreach($provider->getProfile() as $k => $v): ?>
 	<dt><?php echo htmlentities($k); ?></dt>
 	<dd><?php echo htmlentities($v); ?></dd>
 <?php endforeach; ?>

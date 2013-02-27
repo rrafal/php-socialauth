@@ -33,6 +33,13 @@ interface Provider {
 	 * It should be globally unique.
 	 */
 	function getDisplayIdentifier();
+	
+	/**
+	 * Return information about the user, such as name and address.
+	 * It's best to call this right after completeLogin()
+	 * @return array|null
+	 */
+	function getProfile();
 
 	
 	/**

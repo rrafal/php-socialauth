@@ -19,6 +19,7 @@ class OpenID extends Base {
 	
 	protected $login_attributes;
 	protected $user_url;
+	protected $profile;
 	
 	
 	function config($config){
@@ -121,16 +122,11 @@ class OpenID extends Base {
 		
 		if ($response->status == Auth_OpenID_CANCEL) {
 	        // This means the authentication was cancelled.
-	        return array(
-	        	'status' => 'cancel',
-	        );
+	        return false;
 	    } else if ($response->status == Auth_OpenID_FAILURE) {
 	        // Authentication failed; display the error message.
 	        // This means the authentication was cancelled.
-	        return array(
-	        	'status' => 'failure',
-	        	'message' => $response->message 
-	        );			
+	        throw new \Exception($response->message);
 	    } else if ($response->status == Auth_OpenID_SUCCESS) {
 	        // This means the authentication succeeded; 
 	        
@@ -141,23 +137,27 @@ class OpenID extends Base {
 			$this->user_id = $response->getDisplayIdentifier();
 			$this->display_identifier = $response->getDisplayIdentifier();
 			
-			$info = array(
-				'status' => 'success',
-				'id' => $this->user_id,
-			);
+			
 			
 			// get info about the user
-			$info = array_merge($sreg, $info);
+			$profile = array();
+			$profile = array_merge($sreg, $profile);
 			if($ax_resp){
-				$info['email'] = $ax_resp->getSingle('http://axschema.org/contact/email');
-				$info['fullname'] = $ax_resp->getSingle('http://axschema.org/namePerson');
-				$info['nickname'] = $ax_resp->getSingle('http://axschema.org/namePerson/friendly');
-				$info['firstname'] = $ax_resp->getSingle('http://axschema.org/namePerson/first');
-				$info['lastname'] = $ax_resp->getSingle('http://axschema.org/namePerson/last');
+				$profile['email'] = $ax_resp->getSingle('http://axschema.org/contact/email');
+				$profile['fullname'] = $ax_resp->getSingle('http://axschema.org/namePerson');
+				$profile['nickname'] = $ax_resp->getSingle('http://axschema.org/namePerson/friendly');
+				$profile['firstname'] = $ax_resp->getSingle('http://axschema.org/namePerson/first');
+				$profile['lastname'] = $ax_resp->getSingle('http://axschema.org/namePerson/last');
 			}
 			
-			return $info;		
+			
+			$this->profile = $profile;
+			return true;
 		}
+	}
+	
+	public function getProfile(){
+		return $this->profile;
 	}
 	
 	private function getOpenidConsumer(){

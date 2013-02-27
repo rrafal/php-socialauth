@@ -4,11 +4,6 @@ namespace Radulski\SocialAuth\Provider;
 
 require_once __DIR__.'/Base.php';
 
-if( ! class_exists('OAuthRequester') ){
-	require_once __DIR__ . '/oauth-php/library/OAuthRequester.php';
-	require_once __DIR__ . '/oauth-php/library/OAuthStore.php';
-}
-
 
 /**
  * Authenticates user against Twitter account.
@@ -75,7 +70,11 @@ class Twitter extends Base {
 		// get access token
 		$query_options = array();
 		parse_str($query, $query_options);
-			
+		
+		if( ! empty($query_options['denied']) ){
+			return false;
+		}
+		
 		$params = array(
 			'oauth_verifier' => $query_options['oauth_verifier'], 
 			'oauth_token' => $query_options['oauth_token'],
@@ -94,17 +93,17 @@ class Twitter extends Base {
 		
 		
 		// get account info
-		$params = array(
-			'user_id' => $access_token['user_id'], 
-			'screen_name' => $access_token['screen_name'],
-			);
+		return true;
+	}
+	
+	function getProfile(){
+		$params = array();
 		$url = $this->getRequestUrl('account/verify_credentials');
 		$request = new \OAuthRequester($url, 'GET', $params);
 		$result = $request->doRequest();
 
 
 		$info = json_decode($result['body']);
-		
 		return $info;
 	}
 	

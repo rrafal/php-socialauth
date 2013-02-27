@@ -37,6 +37,8 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 		return $this->display_identifier;
 	}
 	
+	abstract public function getProfile();
+	
 	/**
 	 * Begins login process.
 	 * Returns array with key 'type' and additional information
