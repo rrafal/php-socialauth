@@ -37,6 +37,36 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 		return $this->display_identifier;
 	}
 	
+	protected function makeHttpRequest($url, $method = 'GET', $params = array()){
+		if( strtolower($method) == 'get' && $params){
+			if( strpos($url, '?') ){
+				$url .= '&';
+			} else {
+				$url .= '?';
+			}
+			$url .= http_build_query($params, '', '&');
+		}
+	
+
+		
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL, $url); 
+		curl_setopt($curl, CURLOPT_VERBOSE, 0); 
+		curl_setopt($curl, CURLOPT_HEADER, 0);
+		
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		
+		if( strtolower($method) == 'post' ){
+			$post_data = http_build_query($params, '', '&');
+			curl_setopt($curl, CURLOPT_POST, 1);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data); 
+		}
+		
+		$return = curl_exec($curl); 
+		curl_close($curl); 
+		return $return; 
+	}
+	
 	abstract public function getProfile();
 	
 	/**

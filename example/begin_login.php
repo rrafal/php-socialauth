@@ -9,8 +9,7 @@ try{
 	$user_url = null;
 	
 	if($_GET['login'] == 'google'){
-		$provider_name = 'openid';
-		$user_url = 'https://www.google.com/accounts/o8/id';
+		$provider_name = 'google';
 	} elseif($_GET['login'] == 'yahoo'){
 		$provider_name = 'openid';
 		$user_url = 'https://me.yahoo.com/';

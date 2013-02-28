@@ -103,7 +103,7 @@ class Twitter extends Base {
 		$result = $request->doRequest();
 
 
-		$info = json_decode($result['body']);
+		$info = json_decode($result['body'], true);
 		return $info;
 	}
 	

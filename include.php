@@ -1,4 +1,5 @@
 <?php
+
 if( ! class_exists('Facebook') ){
 	require_once __DIR__ . '/facebook-php-sdk/src/facebook.php';
 }

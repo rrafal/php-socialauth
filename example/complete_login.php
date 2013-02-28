@@ -7,10 +7,14 @@ $return_url =  SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.ur
 
 $provider = SocialAuth_Util::getProvider($provider_name);
 $provider->setReturnUrl( $return_url );
-
-$ok = $provider->completeLogin($_SERVER['QUERY_STRING']);
-if( ! $ok){
-	die("Login Failed");
+try{
+	$ok = $provider->completeLogin($_SERVER['QUERY_STRING']);
+	if( ! $ok){
+		die("Login Failed");
+	}
+}catch(\Exception $ex){
+	echo $ex->getMessage();
+	die();
 }
 
 ?>
