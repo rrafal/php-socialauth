@@ -1,4 +1,5 @@
 <?php
+
 include_once __DIR__ . '/util.php';
 $provider_name = $_GET['provider'];
 $identifier = $_GET['identifier'];
@@ -16,24 +17,11 @@ try{
 	echo $ex->getMessage();
 	die();
 }
+@session_start();
 
-?>
-<html>
-<head>
-</head>
-<body>
-<h1>Login</h1>
-<dl>
-	<dt>User ID</dt>
-	<dd><?php echo htmlentities($provider->getUserId()); ?></dd>
-	<dt>Display Name</dt>
-	<dd><?php echo htmlentities($provider->getDisplayIdentifier()); ?></dd>
+$_SESSION['provider'] = $provider_name;
+$_SESSION['user_id'] = $provider->getUserId();
+$_SESSION['display_identifier'] = $provider->getDisplayIdentifier();
+$_SESSION['profile'] = $provider->getProfile();
 
-<?php foreach($provider->getProfile() as $k => $v): ?>
-	<dt><?php echo htmlentities($k); ?></dt>
-	<dd><?php echo htmlentities($v); ?></dd>
-<?php endforeach; ?>
-</dl> 
-</body>
-</html>
-
+SocialAuth_Util::redirect('profile.php');
