@@ -39,15 +39,8 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 	
 	protected function makeHttpRequest($url, $method = 'GET', $params = array()){
 		if( strtolower($method) == 'get' && $params){
-			if( strpos($url, '?') ){
-				$url .= '&';
-			} else {
-				$url .= '?';
-			}
-			$url .= http_build_query($params, '', '&');
+			$url = $this->buildUrl($url, null, $params);
 		}
-	
-
 		
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url); 
@@ -65,6 +58,25 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 		$return = curl_exec($curl); 
 		curl_close($curl); 
 		return $return; 
+	}
+	protected function buildUrl($base, $path = null, $query = array(), $fragment = null){
+		$url = $base;
+		if($path){
+			$url = rtrim($url, '/') . '/' . ltrim($path, '/');
+		}
+		if($query){
+			$url .= strpos($url, '?') ? '&' : '?';
+			
+			if( is_array($query) ){
+				$url .= http_build_query($query, '', '&');
+			} else {
+				$url .= $query;
+			}
+		}
+		if($fragment){
+			$url .= "#" . $fragment;
+		}
+		return $url;
 	}
 	
 	abstract public function getProfile();
