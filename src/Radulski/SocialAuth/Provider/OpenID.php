@@ -21,6 +21,8 @@ class OpenID extends Base {
 	protected $user_url;
 	protected $profile;
 	
+	protected $session;
+	
 	
 	function config($config){
 		if( $this->login_attributes === null ){
@@ -41,10 +43,13 @@ class OpenID extends Base {
 			}
 		}
 		
+		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
 	}
 	
 	public function setUserUrl($url){
 		$this->user_url = $url;
+		
+		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
 	}
 	
 	public function setDatabaseStorage($type, $config){
@@ -56,8 +61,21 @@ class OpenID extends Base {
 		$this->storage_config = array('path' => $path);	
 	}
 	
+	public function loadUser($user_id){
+		if($this->session->getValue('user_id') == $user_id){
+			$this->user_id = $user_id;
+			$this->display_identifier = $this->session->getValue('display_identifier');
+			$this->profile = $this->session->getValue('profile');
+		} else {
+			$this->user_id = null;
+			$this->display_identifier = null;
+			$this->profile = null;
+		}
+	}
+	
 	
 	function beginLogin(){
+		$this->session->clear();
 		$consumer = $this->getOpenidConsumer();
 		$auth_request = $consumer->begin($this->user_url);
 		
@@ -112,7 +130,8 @@ class OpenID extends Base {
 		}
 	}
 	function completeLogin($query){
-		$consumer = $this->getOpenidConsumer();
+		$this->session->setValue('profile', null);
+		$consumer = $this->getOpenidConsumer();	
 		
 		// parse request
 		$query_map = \Auth_OpenID::params_from_string( $query );
@@ -152,6 +171,10 @@ class OpenID extends Base {
 			
 			
 			$this->profile = $profile;
+			$this->session->setValue('profile', $this->profile);
+			$this->session->setValue('user_id', $this->user_id);
+			$this->session->setValue('display_identifier', $this->display_identifier);
+			
 			return true;
 		}
 	}

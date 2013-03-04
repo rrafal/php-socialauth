@@ -17,6 +17,8 @@ class Facebook extends Base {
 	
 	private $access_token;
 	private $profile;
+	private $session;
+	
 	
 	function config($config){
 		if( isset($config['app_id']) ){
@@ -26,12 +28,24 @@ class Facebook extends Base {
 		if( isset($config['secret']) ){
 			$this->secret = $config['secret'];
 		}
+		
+		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\Facebook:'.$this->app_id);
 	}
 	
-	
+	function loadUser($user_id){
+		if($this->session->getValue('user_id') == $user_id){
+			$this->user_id = $user_id;
+			$this->access_token = $this->session->getValue('access_token');
+			$this->display_identifier = $this->session->getValue('display_identifier');
+		} else {
+			$this->user_id = null;
+			$this->access_token = null;
+			$this->display_identifier = null;
+		}
+	}
 	
 	function beginLogin(){
-		
+		$this->session->clear();
 		$scope = array('email');
 
 		$query = array();
@@ -75,23 +89,34 @@ class Facebook extends Base {
 		if( empty($token['access_token']) ){
 			return false;
 		} else {
+			// get and save profile info
 			$this->access_token = $token['access_token'];
-			$this->profile = $this->getProfile();
+			
+			$this->profile = $this->getProfileImpl();
 			if( ! $this->profile){
 				throw new \Exception("Failed to retrieve user profile.");
 			}
 			$this->user_id = $this->profile['id'];
 			$this->display_identifier = $this->profile['link'];
+			
+			$this->session->setValue('access_token', $this->access_token);
+			$this->session->setValue('display_identifier', $this->display_identifier);
+			$this->session->setValue('user_id', $this->user_id);
 			return true;
 		}
 	}
 	function getProfile(){
 		if( ! $this->profile){
-			if( $this->access_token ){
-				$this->profile = $this->graphRequest('me');
-			}
+			$this->profile = $this->getProfileImpl();
 		}
 		return $this->profile;
+	}
+	private function getProfileImpl(){
+		if( $this->access_token ){
+			return $this->graphRequest('me');
+		} else {
+			return null;
+		}
 	}
 	
 	function graphRequest($name, $params = array()){
@@ -103,10 +128,10 @@ class Facebook extends Base {
 	}
 	
 	function getCSRFToken(){
-		$token = $this->getPersistantValue('csrf');
+		$token = $this->session->getValue('csrf');
 		if( $token == null){
 			$token = md5(mt_rand());
-			$this->setPersistantValue('csrf', $token);
+			$this->session->setValue('csrf', $token);
 		}
 		return $token;
 	}
@@ -118,23 +143,7 @@ class Facebook extends Base {
 		return $correct === $value;
 	}
 	
-	/**
-	 * Persist info in session
-	 */
-	private function setPersistantValue($key, $value){
-		@session_start();
-		$base_key = 'Radulski\SocialAuth\Provider\Facebook:'.$this->app_id;
-		$_SESSION[ $base_key ][ $key ] = $value;
-	}
-	private function getPersistantValue($key){
-		@session_start();
-		$base_key = 'Radulski\SocialAuth\Provider\Facebook:'.$this->app_id;
-		if( isset($_SESSION[ $base_key ]) && isset($_SESSION[ $base_key ][ $key ]) ){
-			return $_SESSION[ $base_key ][ $key ];
-		} else {
-			return null;
-		}
-	}
+	
 	
 }
 

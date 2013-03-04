@@ -21,6 +21,11 @@ class Twitter extends Base {
 	
 	private $consumer_key;
 	private $consumer_secret;
+	
+	private $access_token;
+	private $access_token_secret;
+	
+	private $session;
 
 	
 	function config($config){
@@ -42,19 +47,33 @@ class Twitter extends Base {
 		if( isset($config['consumer_secret']) ){
 			$this->consumer_secret = $config['consumer_secret'];
 		}
-
+		
+		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\Twitter:'.$this->consumer_key);
+	}
+	
+	function loadUser($user_id){
+		if($this->session->getValue('user_id') == $user_id){
+			$this->user_id = $user_id;
+			$this->display_identifier = $this->session->getValue('display_identifier');
+			$this->access_token = $this->session->getValue('oauth_access_token');
+			$this->access_token_secret = $this->session->getValue('oauth_access_token_secret');
+		} else {
+			$this->user_id = null;
+			$this->display_identifier = null;
+			$this->access_token = null;
+			$this->access_token_secret = null;
+		}
 	}
 	
 	
-	
 	function beginLogin(){
-		$this->clearSession();
+		$this->session->clear();
 		
 		$oauth = $this->getApi();
 		$request_token_info = $oauth->getRequestToken($this->request_token_url, $this->return_url);
 		
-		$this->setSessionValue('oauth_token', $request_token_info['oauth_token']);
-		$this->setSessionValue('oauth_token_secret', $request_token_info['oauth_token_secret']);
+		$this->session->setValue('oauth_token', $request_token_info['oauth_token']);
+		$this->session->setValue('oauth_token_secret', $request_token_info['oauth_token_secret']);
 		
 
 		$url = $this->authenticate_url . '?oauth_token='.urlencode($request_token_info['oauth_token']);
@@ -77,7 +96,7 @@ class Twitter extends Base {
 		
 		// get access token
 		$oauth = $this->getApi();
-		$oauth_token_secret = $this->getSessionValue( 'oauth_token_secret' );
+		$oauth_token_secret = $this->session->getValue( 'oauth_token_secret' );
 		
 		$oauth->setToken($query_options['oauth_token'], $oauth_token_secret);
 		$access_token_info = $oauth->getAccessToken($this->access_token_url);
@@ -86,13 +105,16 @@ class Twitter extends Base {
 			return false;
 		}
 	
-		// save it
-		$this->setSessionValue('oauth_access_token', $access_token_info['oauth_token']);
-		$this->setSessionValue('oauth_access_token_secret', $access_token_info['oauth_token_secret']);
-		
-
 		$this->user_id = $access_token_info['user_id'];
 		$this->display_identifier = 'http://twitter.com/'.$access_token_info['screen_name'];
+		$this->access_token = $access_token_info['oauth_token'];
+		$this->access_token_secret = $access_token_info['oauth_token_secret'];
+		
+		// save it
+		$this->session->setValue('user_id', $this->user_id);
+		$this->session->setValue('display_identifier', $this->display_identifier);
+		$this->session->setValue('oauth_access_token', $this->access_token);
+		$this->session->setValue('oauth_access_token_secret', $this->access_token_secret);
 		
 		return true;
 	}
@@ -111,40 +133,16 @@ class Twitter extends Base {
 	function getApi(){
 		$oauth = new \OAuth($this->consumer_key,$this->consumer_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
 		
-		$access_token = $this->getSessionValue('oauth_access_token');
-		$access_token_secret = $this->getSessionValue('oauth_access_token_secret');
-		if($access_token && $access_token_secret){
-			$oauth->setToken($access_token, $access_token_secret);
+		$access_token = $this->session->getValue('oauth_access_token');
+		$access_token_secret = $this->session->getValue('oauth_access_token_secret');
+		if($this->access_token && $this->access_token_secret){
+			$oauth->setToken($this->access_token, $this->access_token_secret);
 		}
 		return $oauth;
 	}
 	
 	function getRequestUrl($name){
 		return $this->request_base_url . '/' . $name . '.json';
-	}
-	
-	/**
-	 * Persist info in session
-	 */
-	private function clearSession(){
-		@session_start();
-		$base_key = 'Radulski\SocialAuth\Provider\Twitter:'.$this->consumer_key;
-		$_SESSION[ $base_key ] = array();
-	}
-	
-	private function setSessionValue($key, $value){
-		@session_start();
-		$base_key = 'Radulski\SocialAuth\Provider\Twitter:'.$this->consumer_key;
-		$_SESSION[ $base_key ][ $key ] = $value;
-	}
-	private function getSessionValue($key){
-		@session_start();
-		$base_key = 'Radulski\SocialAuth\Provider\Twitter:'.$this->consumer_key;
-		if( isset($_SESSION[ $base_key ]) && isset($_SESSION[ $base_key ][ $key ]) ){
-			return $_SESSION[ $base_key ][ $key ];
-		} else {
-			return null;
-		}
 	}
 }
 

@@ -20,8 +20,9 @@ class Google extends Base {
 	private $client_id;
 	private $client_secret;
 	
-	private $profile;
-	private $token;
+	private $access_token;
+	
+	private $session;
 
 	
 	function config($config){
@@ -44,12 +45,23 @@ class Google extends Base {
 		if( isset($config['client_secret']) ){
 			$this->client_secret = $config['client_secret'];
 		}		
+		
+		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\Facebook:'.$this->client_id);
 	}
+	
+	function loadUser($user_id){
+		if($this->session->getValue('user_id') == $user_id){
+			$this->user_id = $user_id;
+			$this->token = $this->session->getValue('token');
+			$this->display_identifier = $this->session->getValue('display_identifier');
+		} else {
+			$this->clearUser();
+		}
+	} 
 	
 	function clearUser(){
 		$this->user_id = null;
 		$this->display_identifier = null;
-		$this->profile = null;
 		$this->token = null;
 	}
 	
@@ -57,6 +69,7 @@ class Google extends Base {
 	
 	function beginLogin(){
 		$this->clearUser();
+		$this->session->clear();
 		
 		$url = $this->authenticate_url;
 		$url_query = array();
@@ -120,23 +133,22 @@ class Google extends Base {
 		
 		
 		// get account info
-		$this->profile = $this->getProfileImpl();
-		if($this->profile){
-			$this->user_id = $this->profile['id'];
-			$this->display_identifier = $this->profile['link'];
+		$profile = $this->getProfile();
+		if($profile){
+			$this->user_id = $profile['id'];
+			$this->display_identifier = $profile['link'];
+			
+			// save
+			$this->session->setValue('user_id', $this->user_id);
+			$this->session->setValue('display_identifier', $this->display_identifier);
+			$this->session->setValue('token', $this->token);
 			return true;
 		} else {
 			throw new \Exception("Failed to retrieve profile information.");
 		}
 	}
 	
-	function getProfile(){
-		if( ! $this->profile) {
-			$this->profile = $this->getProfileImpl();
-		}
-		return $this->profile;
-	}
-	private function getProfileImpl(){
+	public function getProfile(){
 		if( ! $this->token){
 			return null;
 		}

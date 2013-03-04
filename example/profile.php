@@ -6,6 +6,9 @@ if( empty($_SESSION['provider']) || empty($_SESSION['user_id']) ){
 	SocialAuth_Util::redirect('index.php');
 }
 
+$provider = $provider = SocialAuth_Util::getProvider($_SESSION['provider']);
+$provider->loadUser($_SESSION['user_id']);
+
 
 ?>
 <html>
@@ -15,11 +18,11 @@ if( empty($_SESSION['provider']) || empty($_SESSION['user_id']) ){
 <h1>Login</h1>
 <dl>
 	<dt>User ID</dt>
-	<dd><?php echo htmlentities($_SESSION['user_id']); ?></dd>
+	<dd><?php echo htmlentities($provider->getUserId()); ?></dd>
 	<dt>Display Name</dt>
-	<dd><?php echo htmlentities($_SESSION['display_identifier']); ?></dd>
+	<dd><?php echo htmlentities($provider->getDisplayIdentifier()); ?></dd>
 
-<?php foreach($_SESSION['profile'] as $k => $v): ?>
+<?php foreach($provider->getProfile() as $k => $v): ?>
 	<dt><?php echo htmlentities($k); ?></dt>
 	<dd><?php echo htmlentities($v); ?></dd>
 <?php endforeach; ?>

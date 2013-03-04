@@ -21,7 +21,5 @@ try{
 
 $_SESSION['provider'] = $provider_name;
 $_SESSION['user_id'] = $provider->getUserId();
-$_SESSION['display_identifier'] = $provider->getDisplayIdentifier();
-$_SESSION['profile'] = $provider->getProfile();
 
 SocialAuth_Util::redirect('profile.php');
