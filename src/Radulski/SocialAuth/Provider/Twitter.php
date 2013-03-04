@@ -48,7 +48,7 @@ class Twitter extends Base {
 			$this->consumer_secret = $config['consumer_secret'];
 		}
 		
-		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\Twitter:'.$this->consumer_key);
+		$this->session = new \Radulski\SocialAuth\Session('Radulski\SocialAuth\Provider\Twitter:'.$this->consumer_key);
 	}
 	
 	function loadUser($user_id){

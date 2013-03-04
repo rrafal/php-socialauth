@@ -46,7 +46,7 @@ class Google extends Base {
 			$this->client_secret = $config['client_secret'];
 		}		
 		
-		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\Facebook:'.$this->client_id);
+		$this->session = new \Radulski\SocialAuth\Session('Radulski\SocialAuth\Provider\Facebook:'.$this->client_id);
 	}
 	
 	function loadUser($user_id){

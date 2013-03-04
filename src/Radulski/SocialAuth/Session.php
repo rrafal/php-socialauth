@@ -1,6 +1,6 @@
 <?php
 
-namespace Radulski\SocialAuth\Storage;
+namespace Radulski\SocialAuth;
 
 class Session {
 	private $base_key;

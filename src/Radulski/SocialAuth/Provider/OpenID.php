@@ -43,13 +43,13 @@ class OpenID extends Base {
 			}
 		}
 		
-		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
+		$this->session = new \Radulski\SocialAuth\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
 	}
 	
 	public function setUserUrl($url){
 		$this->user_url = $url;
 		
-		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
+		$this->session = new \Radulski\SocialAuth\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
 	}
 	
 	public function setDatabaseStorage($type, $config){

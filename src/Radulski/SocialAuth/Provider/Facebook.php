@@ -29,7 +29,7 @@ class Facebook extends Base {
 			$this->secret = $config['secret'];
 		}
 		
-		$this->session = new \Radulski\SocialAuth\Storage\Session('Radulski\SocialAuth\Provider\Facebook:'.$this->app_id);
+		$this->session = new \Radulski\SocialAuth\Session('Radulski\SocialAuth\Provider\Facebook:'.$this->app_id);
 	}
 	
 	function loadUser($user_id){
