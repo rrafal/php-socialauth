@@ -24,4 +24,9 @@ class Session {
 			return null;
 		}
 	}
+	public function deleteValue($key){
+		if( isset($_SESSION[ $this->base_key ]) && isset($_SESSION[ $this->base_key ][ $key ]) ){
+			unset($_SESSION[ $this->base_key ][ $key ]);
+		}
+	}
 }

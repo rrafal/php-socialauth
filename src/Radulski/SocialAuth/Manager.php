@@ -58,6 +58,7 @@ class Manager {
 				'class' => 'Radulski\SocialAuth\Provider\OpenID', 
 				'file' => __DIR__ .'/Provider/OpenID.php',
 				'user_url' => 'https://openid.aol.com/',
+				'storage_type' => 'session',
 				),
 			'facebook' => array(
 				'class' => 'Radulski\SocialAuth\Provider\Facebook', 
@@ -70,6 +71,7 @@ class Manager {
 			'openid' =>  array(
 				'class' => 'Radulski\SocialAuth\Provider\OpenID', 
 				'file' => __DIR__ .'/Provider/OpenID.php',
+				'storage_type' => 'session',
 				),
 			'twitter' =>  array(
 				'class' => 'Radulski\SocialAuth\Provider\Twitter', 
@@ -78,6 +80,7 @@ class Manager {
 				'class' => 'Radulski\SocialAuth\Provider\OpenID', 
 				'file' => __DIR__ .'/Provider/OpenID.php',
 				'user_url' => 'https://me.yahoo.com/',
+				'storage_type' => 'session',
 				),
 		);
 		

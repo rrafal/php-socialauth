@@ -38,9 +38,8 @@ class OpenID extends Base {
 			$this->user_url = $config['user_url'];
 		}
 		if( isset($config['storage_type']) ){
-			if( $config['storage_type'] == 'file' ){
-				$this->setFileStorage($config['storage_path']);
-			}
+			$this->storage_type = $config['storage_type'];
+			$this->storage_config = $config;
 		}
 		
 		$this->session = new \Radulski\SocialAuth\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
@@ -52,15 +51,11 @@ class OpenID extends Base {
 		$this->session = new \Radulski\SocialAuth\Session('Radulski\SocialAuth\Provider\OpenID:'.$this->user_url);
 	}
 	
-	public function setDatabaseStorage($type, $config){
-		$this->storage_type = 'database';
+	public function setStorage($type, $config){
+		$this->storage_type = $type;
 		$this->storage_config = $config;
 	}
-	public function setFileStorage($path){
-		$this->storage_type = 'file';
-		$this->storage_config = array('path' => $path);	
-	}
-	
+
 	public function loadUser($user_id){
 		if($this->session->getValue('user_id') == $user_id){
 			$this->user_id = $user_id;
@@ -184,18 +179,22 @@ class OpenID extends Base {
 	}
 	
 	private function getOpenidConsumer(){
-		if($this->storage_type == 'file'){
+		$store = null;
+		
+		if($this->storage_type == 'session'){
+			require_once __DIR__.'/../Utils/OpenIDSessionStore.php';
+			
+			$store = new \Radulski\SocialAuth\Utils\OpenIDSessionStore();
+		} elseif($this->storage_type == 'file'){
 			require_once 'Auth/OpenID/FileStore.php';
-			
-			
-			$store = new \Auth_OpenID_FileStore($this->storage_config['path']);
-		    $consumer = new \Auth_OpenID_Consumer($store);
-			//new \GApps_OpenID_Discovery($consumer);
-			return $consumer;
+
+			$store = new \Auth_OpenID_FileStore($this->storage_config['storage_path']);
 		} else {
-			throw new \Exception("Not implemented");
-			
+			throw new \Exception("OpenID store not implemented: ".$this->storage_type);
 		}
+		
+		$consumer = new \Auth_OpenID_Consumer($store);
+		return $consumer;
 	}
 }
 
