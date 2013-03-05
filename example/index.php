@@ -5,10 +5,10 @@
 <h1>Login</h1>
 
 <ul>
-	<li><a href="begin_login.php?login=google">with Google</a></li>
-	<li><a href="begin_login.php?login=yahoo">with Yahoo</a></li>
-	<li><a href="begin_login.php?login=facebook">with Facebook</a></li>
-	<li><a href="begin_login.php?login=twitter">with Twitter</a></li>
+	<li><a href="begin_login.php?provider=google">with Google</a></li>
+	<li><a href="begin_login.php?provider=yahoo">with Yahoo</a></li>
+	<li><a href="begin_login.php?provider=facebook">with Facebook</a></li>
+	<li><a href="begin_login.php?provider=twitter">with Twitter</a></li>
 </ul>
 
 </body>

@@ -125,11 +125,11 @@ class Google extends Base {
 		$response = $this->makeHttpRequest($this->access_token_url, 'POST', $params);
 		$token = json_decode($response, true);
 
-		if($token['error']){
+		if( ! empty($token['error']) ){
 			throw new \Exception("Failed to get authorization code: ".$token['error']);
-		} else{
-			$this->token = $token;
 		}
+
+		$this->token = $token;
 		
 		
 		// get account info
