@@ -54,6 +54,11 @@ class Manager {
 	}
 	public function configProviders($config){
 		$defaults = array(
+			'aol' =>  array(
+				'class' => 'Radulski\SocialAuth\Provider\OpenID', 
+				'file' => __DIR__ .'/Provider/OpenID.php',
+				'user_url' => 'https://openid.aol.com/',
+				),
 			'facebook' => array(
 				'class' => 'Radulski\SocialAuth\Provider\Facebook', 
 				'file' => __DIR__ .'/Provider/Facebook.php',
