@@ -49,8 +49,8 @@ class OAuth1  {
 		$headers[] = $this->getHeader($request_token_url, $method, $params);
 
 
-		$response = $this->makeHttpRequest($request_token_url, $method, $params, $headers);
-		
+		$response = $this->makeHttpRequest($request_token_url, $method, array(), $headers);
+
 		$info = array();
 		parse_str($response, $info);        
 		return $info;
@@ -151,7 +151,7 @@ class OAuth1  {
 		if( strtolower($method) == 'get' && $params){
 			$url = $this->buildUrl($url, null, $params);
 		}
-		
+
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $url); 
 		curl_setopt($curl, CURLOPT_VERBOSE, 0); 
@@ -165,7 +165,7 @@ class OAuth1  {
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data); 
 		}
 		if( $headers ){
-			curl_setopt($curl, CURLOPT_HTTPHEADERS, $headers); 
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers); 
 		}
 		
 		$return = curl_exec($curl); 

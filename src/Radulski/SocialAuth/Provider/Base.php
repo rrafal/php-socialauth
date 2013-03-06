@@ -38,7 +38,7 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 		return $this->display_identifier;
 	}
 	
-	protected function makeHttpRequest($url, $method = 'GET', $params = array()){
+	protected function makeHttpRequest($url, $method = 'GET', $params = array(), $headers = array()){
 		if( strtolower($method) == 'get' && $params){
 			$url = $this->buildUrl($url, null, $params);
 		}
@@ -54,6 +54,9 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 			$post_data = http_build_query($params, '', '&');
 			curl_setopt($curl, CURLOPT_POST, 1);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data); 
+		}
+		if( $headers ){
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $headers); 
 		}
 		
 		$return = curl_exec($curl); 
