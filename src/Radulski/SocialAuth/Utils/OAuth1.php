@@ -55,8 +55,11 @@ class OAuth1  {
 		parse_str($response, $info);        
 		return $info;
 	}
-	function getHeader($url, $method, $params){
-		$oauth_params = $this->getOAuthParams($url, $method, $params);
+	/**
+	 * Creates oauth header.
+	 */
+	function getHeader( $method, $url, $params){
+		$oauth_params = $this->getOAuthParams($method, $url, $params);
 		
 		$lines = array();
 		foreach($oauth_params as $k => $v){
@@ -66,7 +69,10 @@ class OAuth1  {
 		return "Authorization: OAuth ".implode(", ", $lines);
 	}
 	
-	function getOAuthParams($url, $method, $params){
+	/**
+	 * Returns all oauth parameters that should be included in request.
+	 */
+	function getOAuthParams( $method, $url, $params){
 		$params['oauth_consumer_key'] = $this->consumer_key;
 		$params['oauth_nonce'] = $this->getNonce();
 		$params['oauth_signature_method'] = 'HMAC-SHA1';
@@ -76,7 +82,7 @@ class OAuth1  {
 			$params['oauth_token'] = $this->access_token;
 		}
 		
-		$params['oauth_signature'] = $this->calculateDataSignature($url, $method, $params);
+		$params['oauth_signature'] = $this->calculateDataSignature($method, $url, $params);
 		
 		$oauth_params = array();
 		foreach($params as $k => $v){
@@ -88,7 +94,16 @@ class OAuth1  {
 		ksort($oauth_params);
 		return $oauth_params;
 	}
-	public function calculateDataSignature($url, $method, $params){
+	/**
+	 * Calculates signature of privded parameters.
+	 * The parameters should include:
+	 * - oauth_consumer_key
+	 * - oauth_nonce
+	 * - oauth_signature_method
+	 * - oauth_timestamp
+	 * - oauth_version
+	 */
+	public function calculateDataSignature( $method, $url, $params){
 		// encode data
 		$lines = array();
 		$lines[] = strtoupper($method);

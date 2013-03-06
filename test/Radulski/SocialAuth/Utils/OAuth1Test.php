@@ -12,7 +12,7 @@ class OAuth1Text extends  \PHPUnit_Framework_TestCase {
 		$params['status'] = 'Hello Ladies + Gentlemen, a signed OAuth request!';
 		$params['include_entities'] = 'true';
 		
-		$actual = $oauth->getOAuthParams('https://api.twitter.com/1/statuses/update.json', 'POST', $params );
+		$actual = $oauth->getOAuthParams('POST', 'https://api.twitter.com/1/statuses/update.json', $params );
 
 
 		$this->assertEquals('xvz1evFS4wEEPTGEFPHBog', $actual['oauth_consumer_key']);
@@ -30,7 +30,7 @@ class OAuth1Text extends  \PHPUnit_Framework_TestCase {
 		$params['oauth_token'] = '370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb';
 		$params['oauth_version'] = '1.0';
 		
-		$actual = $oauth->calculateDataSignature('https://api.twitter.com/1/statuses/update.json', 'POST', $params );
+		$actual = $oauth->calculateDataSignature('POST', 'https://api.twitter.com/1/statuses/update.json',  $params );
 		$expected = 'tnnArxj06cWHq44gCs1OSKk/jLY=';
 		$this->assertEquals($expected, $actual);
 	}
@@ -40,7 +40,7 @@ class OAuth1Text extends  \PHPUnit_Framework_TestCase {
 		$oauth->setNonce('ea9ec8429b68d6b77cd5600adbbb0456');
 		$params['oauth_callback'] = 'http://localhost/sign-in-with-twitter/';
 		
-		$actual = $oauth->getHeader('https://api.twitter.com/oauth/request_token', 'POST', $params );
+		$actual = $oauth->getHeader('POST', 'https://api.twitter.com/oauth/request_token',  $params );
 		$expected = 'Authorization: OAuth oauth_callback="http%3A%2F%2Flocalhost%2Fsign-in-with-twitter%2F",
               oauth_consumer_key="cChZNFj6T5R0TigYB9yd1w",
               oauth_nonce="ea9ec8429b68d6b77cd5600adbbb0456",
