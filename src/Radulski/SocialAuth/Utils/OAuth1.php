@@ -17,8 +17,18 @@ class OAuth1  {
 	private $consumer_key;
 	private $consumer_secret;
 	
-	private $access_token;
-	private $access_token_secret;
+	/**
+	 * oauth token
+	 * It might be access token or request token.
+	 * @var type 
+	 */
+	private $token;
+	/**
+	 * oauth token secret
+	 * Secret token used for signing request.
+	 * @var type 
+	 */
+	private $token_secret;
 	
 	// used for testing
 	private $nonce;
@@ -30,9 +40,9 @@ class OAuth1  {
 		$this->consumer_secret = $secret;
 	}
 
-	function setAccessToken($token, $secret){
-		$this->access_token = $token;
-		$this->access_token_secret = $secret;
+	function setToken($token, $secret){
+		$this->token = $token;
+		$this->token_secret = $secret;
 	}
 	function setNonce($nonce){
 		$this->nonce = $nonce;
@@ -43,18 +53,18 @@ class OAuth1  {
 	
 	function fetchRequestToken($request_token_url, $return_url){
 		// clear
-		$this->access_token = null;
-		$this->access_token_secret = null;
+		$this->token = null;
+		$this->token_secret = null;
 		
 		// make request
 		$params = array('oauth_callback' => $return_url);
 		$method = 'POST';
 	
 		$headers = array();
-		$headers[] = $this->getHeader($request_token_url, $method, $params);
+		$headers[] = $this->getHeader($method, $request_token_url, $params);
 
 
-		$response = $this->makeHttpRequest($request_token_url, $method, array(), $headers);
+		$response = $this->makeHttpRequest($method, $request_token_url,  array(), $headers);
 
 		// parse response
 		$info = array();
@@ -70,15 +80,30 @@ class OAuth1  {
 		$method = 'POST';
 	
 		$headers = array();
-		$headers[] = $this->getHeader($access_token_url, $method, $params);
+		$headers[] = $this->getHeader($method, $access_token_url, $params);
 
-		$response = $this->makeHttpRequest($request_token_url, $method, $params, $headers);
+		$response = $this->makeHttpRequest($method, $access_token_url,  $params, $headers);
 
 		// parse response
 		$info = array();
 		parse_str($response, $info);        
 		return $info;
 	}
+	/**
+	 *
+	 * @param string $method GET or POST
+	 * @param string $url 
+	 * @param array $params
+	 * @return string 
+	 */
+	function fetch($method, $url, $params = array()){
+		$headers = array();
+		$headers[] = $this->getHeader($method, $url, $params);
+		
+		$response = $this->makeHttpRequest($method, $url,  $params, $headers);
+		return $response;
+	}
+	
 	/**
 	 * Creates oauth header.
 	 */
@@ -108,8 +133,8 @@ class OAuth1  {
 			$auth_params['oauth_callback'] = $params['oauth_callback'];
 		}
 		
-		if($this->access_token){
-			$auth_params['oauth_token'] = $this->access_token;
+		if($this->token){
+			$auth_params['oauth_token'] = $this->token;
 		}
 		
 		$all_params = array_merge($params, $auth_params);
@@ -141,8 +166,8 @@ class OAuth1  {
 		// get signature key
 		$key = $this->urlencode($this->consumer_secret) . '&';
 		
-		if($this->access_token_secret){
-			$key .= $this->urlencode($this->access_token_secret);
+		if($this->token_secret){
+			$key .= $this->urlencode($this->token_secret);
 		}
 
 		// generate signature
@@ -186,8 +211,8 @@ class OAuth1  {
     	}
     }
     
-    protected function makeHttpRequest($url, $method = 'GET', $params = array(), $headers = array()){
-		if( strtolower($method) == 'get' && $params){
+    protected function makeHttpRequest($method, $url,  $params = array(), $headers = array()){
+		if( strtoupper($method) == 'GET' && $params){
 			$url = $this->buildUrl($url, null, $params);
 		}
 
@@ -198,7 +223,7 @@ class OAuth1  {
 		
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 		
-		if( strtolower($method) == 'post' ){
+		if( strtoupper($method) == 'POST' ){
 			$post_data = http_build_query($params, '', '&');
 			curl_setopt($curl, CURLOPT_POST, 1);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data); 

@@ -1,8 +1,7 @@
 <?php
 
 include_once __DIR__ . '/util.php';
-$provider_name = $_GET['provider'];
-$identifier = $_GET['identifier'];
+$provider_name = @$_GET['provider'];
 
 $return_url =  SocialAuth_Util::getRootUrl() . 'complete_login.php?provider='.urlencode($provider_name);
 

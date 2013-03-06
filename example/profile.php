@@ -24,7 +24,13 @@ $provider->loadUser($_SESSION['user_id']);
 
 <?php foreach($provider->getProfile() as $k => $v): ?>
 	<dt><?php echo htmlentities($k); ?></dt>
-	<dd><?php echo htmlentities($v); ?></dd>
+	<dd><?php
+		if(is_string($v)){
+			echo htmlentities($v);
+		} else {
+			echo htmlentities(json_encode($v));
+		}
+?></dd>
 <?php endforeach; ?>
 </dl> 
 

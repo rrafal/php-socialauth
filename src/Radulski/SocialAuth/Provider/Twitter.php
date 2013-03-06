@@ -71,7 +71,6 @@ class Twitter extends Base {
 		
 		$oauth = $this->getOAuth();
 		$request_token_info = $oauth->fetchRequestToken($this->request_token_url, $this->return_url);
-		print_r($request_token_info);die();
 		$this->session->setValue('oauth_token', $request_token_info['oauth_token']);
 		$this->session->setValue('oauth_token_secret', $request_token_info['oauth_token_secret']);
 		
@@ -102,17 +101,11 @@ class Twitter extends Base {
 		if($token != $query_options['oauth_token']){
 			return false;// cannot validate without correct secret
 		}
-				
+		
+		// get access token
 		$oauth = $this->getOAuth();
 		$oauth->setToken($token, $token_secret);
 		$access_token_info = $oauth->fetchAccessToken($this->access_token_url, $token_verifier);
-		
-		// get access token
-		$oauth = $this->getApi();
-		$oauth_token_secret = $this->session->getValue( 'oauth_token_secret' );
-		
-		$oauth->setToken($query_options['oauth_token'], $oauth_token_secret);
-		$access_token_info = $oauth->getAccessToken($this->access_token_url);
 		
 		if(empty($access_token_info['user_id']) ){
 			return false;
@@ -135,21 +128,11 @@ class Twitter extends Base {
 	function getProfile(){
 		$url = $this->getRequestUrl('account/verify_credentials');
 		
-		$oauth = $this->getApi();
-		$oauth->fetch( $url );
+		$oauth = $this->getOAuth();
+		$response = $oauth->fetch( 'GET', $url );
 		
-		$response = $oauth->getLastResponse();
 		$profile = json_decode($response, true);
 		return $profile;
-	}
-	
-	function getApi(){
-		$oauth = new \OAuth($this->consumer_key,$this->consumer_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
-		
-		if($this->access_token && $this->access_token_secret){
-			$oauth->setToken($this->access_token, $this->access_token_secret);
-		}
-		return $oauth;
 	}
 	
 	function getOAuth(){
@@ -157,7 +140,7 @@ class Twitter extends Base {
 		$oauth->setConsumer($this->consumer_key, $this->consumer_secret);
 
 		if($this->access_token && $this->access_token_secret){
-			$oauth->setAccessToken($this->access_token, $this->access_token_secret);
+			$oauth->setToken($this->access_token, $this->access_token_secret);
 		}
 		return $oauth;
 	}
