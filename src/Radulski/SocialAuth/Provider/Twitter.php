@@ -70,8 +70,8 @@ class Twitter extends Base {
 		$this->session->clear();
 		
 		$oauth = $this->getOAuth();
-		$request_token_info = $oauth->getRequestToken($this->request_token_url, $this->return_url);
-		
+		$request_token_info = $oauth->fetchRequestToken($this->request_token_url, $this->return_url);
+		print_r($request_token_info);die();
 		$this->session->setValue('oauth_token', $request_token_info['oauth_token']);
 		$this->session->setValue('oauth_token_secret', $request_token_info['oauth_token_secret']);
 		
@@ -93,6 +93,19 @@ class Twitter extends Base {
 		if( empty($query_options['oauth_token']) ){
 			return false;
 		}
+		
+		
+		$token = $this->session->getValue('oauth_token');
+		$token_verifier = $this->session->getValue('oauth_verifier');
+		$token_secret = $this->session->getValue('oauth_token_secret');
+		
+		if($token != $query_options['oauth_token']){
+			return false;// cannot validate without correct secret
+		}
+				
+		$oauth = $this->getOAuth();
+		$oauth->setToken($token, $token_secret);
+		$access_token_info = $oauth->fetchAccessToken($this->access_token_url, $token_verifier);
 		
 		// get access token
 		$oauth = $this->getApi();
@@ -133,8 +146,6 @@ class Twitter extends Base {
 	function getApi(){
 		$oauth = new \OAuth($this->consumer_key,$this->consumer_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
 		
-		$access_token = $this->session->getValue('oauth_access_token');
-		$access_token_secret = $this->session->getValue('oauth_access_token_secret');
 		if($this->access_token && $this->access_token_secret){
 			$oauth->setToken($this->access_token, $this->access_token_secret);
 		}

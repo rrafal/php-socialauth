@@ -41,7 +41,12 @@ class OAuth1  {
 		$this->timestamp = $ts;
 	}
 	
-	function getRequestToken($request_token_url, $return_url){
+	function fetchRequestToken($request_token_url, $return_url){
+		// clear
+		$this->access_token = null;
+		$this->access_token_secret = null;
+		
+		// make request
 		$params = array('oauth_callback' => $return_url);
 		$method = 'POST';
 	
@@ -51,6 +56,25 @@ class OAuth1  {
 
 		$response = $this->makeHttpRequest($request_token_url, $method, array(), $headers);
 
+		// parse response
+		$info = array();
+		parse_str($response, $info);        
+		return $info;
+	}
+	
+	function fetchAccessToken($access_token_url, $token_verifier){
+		// make request
+		$params = array(
+			'oauth_verifier' => $token_verifier,
+			);
+		$method = 'POST';
+	
+		$headers = array();
+		$headers[] = $this->getHeader($access_token_url, $method, $params);
+
+		$response = $this->makeHttpRequest($request_token_url, $method, $params, $headers);
+
+		// parse response
 		$info = array();
 		parse_str($response, $info);        
 		return $info;
@@ -59,10 +83,10 @@ class OAuth1  {
 	 * Creates oauth header.
 	 */
 	function getHeader( $method, $url, $params){
-		$oauth_params = $this->getOAuthParams($method, $url, $params);
+		$auth_params = $this->getAuthParams($method, $url, $params);
 		
 		$lines = array();
-		foreach($oauth_params as $k => $v){
+		foreach($auth_params as $k => $v){
 			$lines[] = sprintf('%s="%s"', $this->urlencode($k), $this->urlencode($v) );
 		}
 
@@ -70,29 +94,29 @@ class OAuth1  {
 	}
 	
 	/**
-	 * Returns all oauth parameters that should be included in request.
+	 * Returns all oauth authorization parameters that should be included in request.
 	 */
-	function getOAuthParams( $method, $url, $params){
-		$params['oauth_consumer_key'] = $this->consumer_key;
-		$params['oauth_nonce'] = $this->getNonce();
-		$params['oauth_signature_method'] = 'HMAC-SHA1';
-		$params['oauth_timestamp'] = $this->getTimestamp();
-		$params['oauth_version'] = '1.0';
+	function getAuthParams( $method, $url, $params){
+		$auth_params = array();
+		$auth_params['oauth_consumer_key'] = $this->consumer_key;
+		$auth_params['oauth_nonce'] = $this->getNonce();
+		$auth_params['oauth_signature_method'] = 'HMAC-SHA1';
+		$auth_params['oauth_timestamp'] = $this->getTimestamp();
+		$auth_params['oauth_version'] = '1.0';
+		
+		if( isset($params['oauth_callback']) ){
+			$auth_params['oauth_callback'] = $params['oauth_callback'];
+		}
+		
 		if($this->access_token){
-			$params['oauth_token'] = $this->access_token;
+			$auth_params['oauth_token'] = $this->access_token;
 		}
 		
-		$params['oauth_signature'] = $this->calculateDataSignature($method, $url, $params);
+		$all_params = array_merge($params, $auth_params);
+		$auth_params['oauth_signature'] = $this->calculateDataSignature($method, $url, $all_params);
 		
-		$oauth_params = array();
-		foreach($params as $k => $v){
-			if( strpos($k, 'oauth_') === 0 ){
-				$oauth_params[ $k ] = $v;
-			}
-		}
-
-		ksort($oauth_params);
-		return $oauth_params;
+		ksort($auth_params);
+		return $auth_params;
 	}
 	/**
 	 * Calculates signature of privded parameters.
