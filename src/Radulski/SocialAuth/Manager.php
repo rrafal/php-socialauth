@@ -2,7 +2,9 @@
 
 namespace Radulski\SocialAuth;
 
+require_once __DIR__ . '/Exception.php';
 require_once __DIR__ . '/Provider.php';
+
 
 class Manager {
 	private $base_url;

@@ -2,6 +2,8 @@
 
 namespace Radulski\SocialAuth\Utils;
 
+require_once __DIR__ . '/../Exception.php';
+
 
 
 	
@@ -212,6 +214,7 @@ class OAuth1  {
     }
     
     protected function makeHttpRequest($method, $url,  $params = array(), $headers = array()){
+		$url_argument = $url;
 		if( strtoupper($method) == 'GET' && $params){
 			$url = $this->buildUrl($url, null, $params);
 		}
@@ -233,6 +236,19 @@ class OAuth1  {
 		}
 		
 		$return = curl_exec($curl); 
+		$error = curl_error($curl);
+		$code =  curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		
+		if($code != 200){
+			if($return){
+				throw new \Radulski\SocialAuth\Exception($return);
+			} elseif($error) {
+				throw new \Radulski\SocialAuth\Exception($error);
+			} else {
+				throw new \Radulski\SocialAuth\Exception("Failed to make CURL request to: ".$url_argument);
+			}
+		}
+
 		curl_close($curl); 
 		return $return; 
 	}

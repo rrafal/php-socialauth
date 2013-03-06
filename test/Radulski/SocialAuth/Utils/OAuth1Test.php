@@ -57,6 +57,18 @@ class OAuth1Text extends  \PHPUnit_Framework_TestCase {
         
 		$this->assertEquals($expected, $actual);
 	}
+	
+	function testFetchRequestToken(){
+		
+		$oauth = $this->getSignInOAuth();
+		$return_url = 'http://localhost/sign-in-with-oauth/';
+		
+		$this->setExpectedException('Radulski\SocialAuth\Exception');
+
+		$oauth->fetchRequestToken('https://api.twitter.com/oauth/request_token',  $return_url );
+
+	}
+	
 	private function getSignInOAuth(){
 		$oauth = new OAuth1();
 		$oauth->setConsumer('cChZNFj6T5R0TigYB9yd1w', 'L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg');
@@ -70,7 +82,7 @@ class OAuth1Text extends  \PHPUnit_Framework_TestCase {
 	private function getSignatureOAuth(){
 		$oauth = new OAuth1();
 		$oauth->setConsumer('xvz1evFS4wEEPTGEFPHBog', 'kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw');
-		$oauth->setAccessToken('370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb', 'LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE');
+		$oauth->setToken('370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb', 'LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE');
 		$oauth->setNonce('kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg');
 		$oauth->setTimestamp('1318622958');
 		return $oauth;
