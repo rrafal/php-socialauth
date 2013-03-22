@@ -4,6 +4,10 @@ namespace Radulski\SocialAuth\Provider;
 
 require_once __DIR__.'/Base.php';
 
+use Radulski\SocialAuth\Exception;
+use Radulski\SocialAuth\NotSupportedException;
+
+
 
 /**
  * This is OAuth2 implementation for Google login
@@ -104,7 +108,7 @@ class Google extends Base {
 			if($error == 'access_denied' ){
 				return false;
 			} else {
-				throw new \Exception($error);
+				throw new Exception($error);
 			}
 		}
 		// get authorization code
@@ -126,7 +130,7 @@ class Google extends Base {
 		$token = json_decode($response, true);
 
 		if( ! empty($token['error']) ){
-			throw new \Exception("Failed to get authorization code: ".$token['error']);
+			throw new Exception("Failed to get authorization code: ".$token['error']);
 		}
 
 		$this->token = $token;
@@ -144,7 +148,7 @@ class Google extends Base {
 			$this->session->setValue('token', $this->token);
 			return true;
 		} else {
-			throw new \Exception("Failed to retrieve profile information.");
+			throw new Exception("Failed to retrieve profile information.");
 		}
 	}
 	
@@ -157,6 +161,13 @@ class Google extends Base {
 		$response = $this->makeHttpRequest($this->profile_url, 'GET', $params);
 		return json_decode($response, true);
 	}
+        
+        function beginAuthorization($scope){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
+        function completeAuthorization($query){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
 	
 }
 

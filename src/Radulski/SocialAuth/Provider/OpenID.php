@@ -3,11 +3,16 @@
 namespace Radulski\SocialAuth\Provider;
 
 require_once __DIR__.'/Base.php';
+
 require_once 'Auth/OpenID.php';
 require_once 'Auth/OpenID/AX.php';
 require_once 'Auth/OpenID/Consumer.php';
 require_once 'Auth/OpenID/PAPE.php';
 require_once 'Auth/OpenID/SReg.php';
+
+
+use Radulski\SocialAuth\Exception;
+use Radulski\SocialAuth\NotSupportedException;
 
 /**
  * Install: php-openid
@@ -100,7 +105,7 @@ class OpenID extends Base {
 			$redirect_url = $auth_request->redirectURL($this->base_url, $this->return_url);
 					
 			if (\Auth_OpenID::isFailure($redirect_url)) {
-				throw new \Exception("Canned create redirect URL");
+				throw new Exception("Canned create redirect URL");
 			}
 			
 			// done
@@ -115,7 +120,7 @@ class OpenID extends Base {
 	        // Display an error if the form markup couldn't be generated;
 	        // otherwise, render the HTML.
 	        if (\Auth_OpenID::isFailure($form_html)) {
-	            throw new \Exception("Failed to generate OpenID login form.");
+	            throw new Exception("Failed to generate OpenID login form.");
 	        }
 			
 			return array(
@@ -140,7 +145,7 @@ class OpenID extends Base {
 	    } else if ($response->status == Auth_OpenID_FAILURE) {
 	        // Authentication failed; display the error message.
 	        // This means the authentication was cancelled.
-	        throw new \Exception($response->message);
+	        throw new Exception($response->message);
 	    } else if ($response->status == Auth_OpenID_SUCCESS) {
 	        // This means the authentication succeeded; 
 	        
@@ -190,11 +195,18 @@ class OpenID extends Base {
 
 			$store = new \Auth_OpenID_FileStore($this->storage_config['storage_path']);
 		} else {
-			throw new \Exception("OpenID store not implemented: ".$this->storage_type);
+			throw new NotSupportedException("OpenID store not implemented: ".$this->storage_type);
 		}
 		
 		$consumer = new \Auth_OpenID_Consumer($store);
 		return $consumer;
 	}
+        
+        function beginAuthorization($scope){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
+        function completeAuthorization($query){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
 }
 

@@ -34,12 +34,6 @@ interface Provider {
 	 */
 	function getDisplayIdentifier();
 	
-	/**
-	 * Return information about the user, such as name and address.
-	 * It's best to call this right after completeLogin()
-	 * @return array|null
-	 */
-	function getProfile();
 
 	
 	/**
@@ -60,5 +54,24 @@ interface Provider {
 	 * Status may be: failure, cancel, success
 	 */
 	function completeLogin($query);
+        
+        
+	/**
+	 * Return information about the user, such as name and address.
+	 * It's best to call this right after completeLogin()
+	 * @return array|null
+	 */
+	function getProfile();
+        
+        /**
+         * Requests authorization for some access
+         */
+        function beginAuthorization($scope);
+        
+        /**
+         * Complete authorization process. 
+         */
+        function completeAuthorization($query);
+        
 }
 

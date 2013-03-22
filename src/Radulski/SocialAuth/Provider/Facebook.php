@@ -5,6 +5,11 @@ namespace Radulski\SocialAuth\Provider;
 require_once __DIR__.'/Base.php';
 
 
+use Radulski\SocialAuth\Exception;
+use Radulski\SocialAuth\NotSupportedException;
+
+
+
 
 /**
  */
@@ -72,7 +77,7 @@ class Facebook extends Base {
 		}
 		
 		if( ! $this->checkCSRFToken($query_params['state']) ){
-			throw new \Exception("Cannot validate the login response.");
+			throw new Exception("Cannot validate the login response.");
 		}
 		$code = $query_params['code'];
 		$params = array(
@@ -94,7 +99,7 @@ class Facebook extends Base {
 			
 			$this->profile = $this->getProfileImpl();
 			if( ! $this->profile){
-				throw new \Exception("Failed to retrieve user profile.");
+				throw new Exception("Failed to retrieve user profile.");
 			}
 			$this->user_id = $this->profile['id'];
 			$this->display_identifier = $this->profile['link'];
@@ -118,6 +123,13 @@ class Facebook extends Base {
 			return null;
 		}
 	}
+        
+        function beginAuthorization($scope){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
+        function completeAuthorization($query){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
 	
 	function graphRequest($name, $params = array()){
 		$url = 'https://graph.facebook.com/'.$name;

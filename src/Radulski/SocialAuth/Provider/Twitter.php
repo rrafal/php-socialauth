@@ -5,6 +5,9 @@ namespace Radulski\SocialAuth\Provider;
 require_once __DIR__.'/Base.php';
 require_once __DIR__.'/../Utils/OAuth1.php';
 
+use Radulski\SocialAuth\Exception;
+use Radulski\SocialAuth\NotSupportedException;
+
 	
 /**
  * Authenticates user against Twitter account.
@@ -148,7 +151,13 @@ class Twitter extends Base {
 	function getRequestUrl($name){
 		return $this->request_base_url . '/' . $name . '.json';
 	}
-	
+        
+        function beginAuthorization($scope){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
+        function completeAuthorization($query){
+            throw new NotSupportedException("Authorization request is not supported.");
+        }
 }
 
 

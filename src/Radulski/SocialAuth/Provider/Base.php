@@ -2,8 +2,12 @@
 
 namespace Radulski\SocialAuth\Provider;
 
+require_once __DIR__ . '/../Exception.php';
+require_once __DIR__ . '/../NotSupportedException.php';
 require_once __DIR__ . '/../Provider.php';
 require_once __DIR__ . '/../Session.php';
+
+
 
 abstract class Base implements \Radulski\SocialAuth\Provider {
 	protected $user_id;
