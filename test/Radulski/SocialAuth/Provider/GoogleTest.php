@@ -13,4 +13,9 @@ class GoogleTest extends  \PHPUnit_Framework_TestCase {
         ));
     }
     
+    function testBeginLogin(){
+        $p = new Google();
+        $p->beginLogin('profile');
+    }
+    
 }

@@ -49,7 +49,7 @@ class Facebook extends Base {
 		}
 	}
 	
-	function beginLogin(){
+	function beginLogin($scope = null){
 		$this->session->clear();
 		$scope = array('email');
 
@@ -88,7 +88,7 @@ class Facebook extends Base {
 		);
 		$response = $this->makeHttpRequest($this->access_token_url, 'POST', $params);
 		$token = array();
-    	parse_str($response, $token);
+		parse_str($response, $token);
 
 		                      
 		if( empty($token['access_token']) ){
@@ -123,13 +123,10 @@ class Facebook extends Base {
 			return null;
 		}
 	}
-        
-        function beginAuthorization($scope){
-            throw new NotSupportedException("Authorization request is not supported.");
-        }
-        function completeAuthorization($query){
-            throw new NotSupportedException("Authorization request is not supported.");
-        }
+	function listContacts(){
+		throw new NotSupportedException("Listing contacts of facebook is not supported.");
+	}
+	
 	
 	function graphRequest($name, $params = array()){
 		$url = 'https://graph.facebook.com/'.$name;

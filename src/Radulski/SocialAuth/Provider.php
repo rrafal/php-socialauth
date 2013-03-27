@@ -10,32 +10,30 @@ interface Provider {
 	 * Sets our server's URL
 	 */
 	function setBaseUrl($url);
-	
+
 	/**
 	 * URL for redirect after login.
 	 */
 	function setReturnUrl($url);
-	
+
 	/**
 	 * Sets what user we should connect to.
 	 */
 	function loadUser($user_id);
-	
+
 	/**
 	 * Returns ID for current user.
 	 * Call this after login to save user's ID.
 	 * It must be unique within provider.
 	 */
 	function getUserId();
-	
+
 	/**
 	 * This is human-friendly identfier for the user.
 	 * It should be globally unique.
 	 */
 	function getDisplayIdentifier();
-	
 
-	
 	/**
 	 * Begins login process.
 	 * 
@@ -46,32 +44,20 @@ interface Provider {
 	 *
 	 * 
 	 */
-	function beginLogin();
-	
+	function beginLogin($scope = null);
+
 	/**
 	 * Completes login process
 	 * Returns array with key 'status' and other information.
 	 * Status may be: failure, cancel, success
 	 */
 	function completeLogin($query);
-        
-        
+
 	/**
 	 * Return information about the user, such as name and address.
 	 * It's best to call this right after completeLogin()
 	 * @return array|null
 	 */
 	function getProfile();
-        
-        /**
-         * Requests authorization for some access
-         */
-        function beginAuthorization($scope);
-        
-        /**
-         * Complete authorization process. 
-         */
-        function completeAuthorization($query);
-        
 }
 

@@ -93,7 +93,7 @@ abstract class Base implements \Radulski\SocialAuth\Provider {
 	 * Begins login process.
 	 * Returns array with key 'type' and additional information
 	 */
-	abstract public function beginLogin();
+	abstract public function beginLogin($scope = null);
 	/**
 	 * Completes login process
 	 * Returns array with key 'status' and other information.

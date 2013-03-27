@@ -34,8 +34,10 @@ $provider->loadUser($_SESSION['user_id']);
 <?php endforeach; ?>
 </dl> 
 
-
-<a href="index.php">Home</a>
+<ul>
+	<li><a href="index.php">Home</a></li>
+	<li><a href="contacts.php">Contacts</a></li>
+</ul>
 </body>
 </html>
 
